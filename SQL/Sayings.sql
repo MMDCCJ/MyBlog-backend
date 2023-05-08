@@ -1,0 +1,7 @@
+USE blog;
+
+CREATE TABLE sayings (
+   ID INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+   saying VARCHAR(255)  NOT NULL,
+   speaker VARCHAR(40)  NOT NULL
+);
