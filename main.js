@@ -13,7 +13,7 @@ app.listen(port, () => console.log(`Example app listening on port ${port}!`))
 
 app.use('/',express.static('./web'))
 app.get('/api/sayings',(req,res)=>{
-    res.setHeader("Access-Control-Allow-Origin","http://www.mmdccj.xyz")
+    res.setHeader("Access-Control-Allow-Origin","*") // 上线后请将这里改成 http://www.mmdccj.xyz
     const sqlStr = 'SELECT * FROM sayings'
     db.query(sqlStr,(err,result)=>{
         if(err) res.send({
