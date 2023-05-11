@@ -1,0 +1,11 @@
+USE blog;
+INSERT INTO Article(firstUpdateDate,lastUpdateDate,title,articleBody) VALUE("2023-5-11","2023-5-11","关于本站","关于本站");
+INSERT INTO Article(firstUpdateDate,lastUpdateDate,title,articleBody) VALUE("2023-5-11","2023-5-11","测试1","关于本站");
+INSERT INTO Article(firstUpdateDate,lastUpdateDate,title,articleBody) VALUE("2023-5-11","2023-5-11","测试2","关于本站");
+INSERT INTO Article(firstUpdateDate,lastUpdateDate,title,articleBody) VALUE("2023-5-11","2023-5-11","测试3","关于本站");
+INSERT INTO Article(firstUpdateDate,lastUpdateDate,title,articleBody) VALUE("2023-5-11","2023-5-11","测试4","关于本站");
+INSERT INTO Article(firstUpdateDate,lastUpdateDate,title,articleBody) VALUE("2023-5-11","2023-5-11","测试5","关于本站");
+INSERT INTO Article(firstUpdateDate,lastUpdateDate,title,articleBody) VALUE("2023-5-11","2023-5-11","测试6","关于本站");
+INSERT INTO Article(firstUpdateDate,lastUpdateDate,title,articleBody) VALUE("2023-5-11","2023-5-11","测试7","关于本站");
+INSERT INTO Article(firstUpdateDate,lastUpdateDate,title,articleBody) VALUE("2023-5-11","2023-5-11","测试8","关于本站");
+INSERT INTO Article(firstUpdateDate,lastUpdateDate,title,articleBody) VALUE("2023-5-11","2023-5-11","测试9","关于本站");
