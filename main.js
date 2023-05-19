@@ -13,12 +13,18 @@ const db = mysql.createPool({
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))
 app.use('/', express.static('./web'))
 app.use(body_parser.urlencoded({ extended: false }))
+app.all('*', function (req, res, next) {
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8080');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST');
+    res.setHeader("Access-Control-Allow-Headers", "content-type,curUserId,token,platform");
+
+    next();
+})
 // 博客slogan
 app.get('/api/sayings', (req, res) => {
-    res.setHeader("Access-Control-Allow-Origin", "*") // 上线后请将这里改成 http://www.mmdccj.xyz
     const sqlStr = 'SELECT * FROM sayings'
     db.query(sqlStr, (err, result) => {
-        if (err) res.send({
+        if (err) return res.send({
             code: 400,
             data: err
         })
@@ -37,21 +43,26 @@ app.get('/api/sayings', (req, res) => {
 })
 // 文章详细页
 app.get('/api/article/overview', (req, res) => {
-    // console.log(req.query.page);
-    const page = 10 * (Number(req.query.page) - 1);
+    const page = 5 * (Number(req.query.page) - 1);
     // 从后到前查找所有的文章 一次返回10条数据
     const sql = `SELECT * FROM Article
                 WHERE id <= (SELECT MAX(id) FROM Article)-?
                 ORDER BY id DESC
-                LIMIT 10`
+                LIMIT 5`
     db.query(sql, [page], (err, result) => {
         if (err) {
-            res.send({
+            return res.send({
                 code: 400,
                 data: err
             })
         }
-        if (result.length === 0) {
+        if (!result) {
+            return res.send({
+                code: 200,
+                msg: 'error'
+            })
+        }
+        if (result?.length === 0) {
             return res.send({
                 code: 204,
                 msg: "数据库内容缺失或超出范围"
@@ -69,7 +80,7 @@ app.get('/api/article/overview', (req, res) => {
 })
 // 查询具体文章
 app.get('/api/article/content', (req, res) => {
-    const id = req.query.page;
+    const id = req.query.id;
     const sql = `SELECT * FROM article_main
                 WHERE AID = ?`
     db.query(sql, [id], (err, result) => {
@@ -94,12 +105,12 @@ app.get('/api/article/content', (req, res) => {
 // 创建文章
 app.post('/api/writing', (req, res) => {
     const reqBody = req.body
-    const Article_SQL = `INSERT INTO Article(firstUpdateDate,lastUpdateDate,title,articleBody,articleType,isDelete) VALUES(?,?,?,?,?,?)`
+    const Article_SQL = `INSERT INTO Article(firstUpdateDate,lastUpdateDate,title,articleBody,articleType,isDelete,author) VALUES(?,?,?,?,?,?,?)`
     const Article_Main_SQL = `INSERT INTO Article_Main(AID,article) VALUES(?,?)`
     const date = DateFormat(new Date())
-    db.query(Article_SQL, [date, date, reqBody.title, reqBody.articleBody, reqBody.articleType, "N"], (err, result) => {
+    db.query(Article_SQL, [date, date, reqBody.title, reqBody.articleBody, reqBody.articleType, "N", reqBody.author], (err, result) => {
         if (err) {
-            res.send({
+            return res.send({
                 code: 400,
                 data: err
             })
@@ -125,8 +136,8 @@ app.post('/api/writing', (req, res) => {
                 })
             }
             return res.send({
-                code:200,
-                msg:"添加成功！"
+                code: 200,
+                msg: "添加成功！"
             })
         })
     })
