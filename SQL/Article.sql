@@ -7,5 +7,6 @@ CREATE TABLE Article (
    title VARCHAR(50) NOT NULL,
    articleBody TEXT NOT NULL,
    articleType varchar(20) NOT NULL,
-   isDelete char(1) NOT NULL
+   isDelete char(1) NOT NULL,
+   author varchar(10)
 );
