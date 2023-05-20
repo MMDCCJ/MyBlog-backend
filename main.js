@@ -7,14 +7,14 @@ const { DateFormat } = require('./utils');
 const db = mysql.createPool({
     host: "127.0.0.1",
     user: 'root',
-    password: '020522', // 上线后改成20020522
+    password: '20020522', // 上线后改成20020522
     database: 'blog'
 })
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))
 app.use('/', express.static('./web'))
 app.use(body_parser.urlencoded({ extended: false }))
 app.all('*', function (req, res, next) {
-    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8080');
+    res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST');
     res.setHeader("Access-Control-Allow-Headers", "content-type,curUserId,token,platform");
 
@@ -122,7 +122,7 @@ app.post('/api/writing', (req, res) => {
             })
         }
         const AID = result.insertId;
-        db.query(d = Article_Main_SQL, [AID, reqBody.articleMain], (err, result) => {
+        db.query(Article_Main_SQL, [AID, reqBody.articleMain], (err, result) => {
             if (err) {
                 res.send({
                     code: 400,
