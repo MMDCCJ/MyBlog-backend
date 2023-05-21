@@ -143,6 +143,81 @@ app.post('/api/writing', (req, res) => {
     })
 
 })
+// 获取文章的详细信息用于编辑
+app.get('api/writing/updateData', (req, res) => {
+    const id = req.query.id;
+    const sql = `SELECT
+    article_main.article,
+    article.title,
+    article.articleBody,
+    article.articleType,
+    article.author
+    FROM
+    article_main ,
+    article
+    WHERE article_main.id = ?,article.AID=article_main.id
+    `
+    db.query(sql, [id], (error, result) => {
+        if (err) {
+            return res.send({
+                code: 400,
+                data: err
+            })
+        }
+        if (result.length === 0) {
+            return res.send({
+                code: 204,
+                msg: "修改失败"
+            })
+        }
+        return res.send({
+            code:200,
+            data:result
+        })
+    })
+})
+// 修改更新文章
+app.post('api/updateArticle', (req, res) => {
+    const reqBody = req.body
+    const date = DateFormat(new Date())
+    const UpdateArticleSql = `UPDATE Article SET lastUpdate=?,title=?,articleBody=?,articleType=?,author=?
+    WHERE ID = ?
+    `
+    const UpdateArticleMainSql = `UPDATE Article_Main SET article=? WHERE AID=?`
+    db.query(UpdateArticleSql, [date, reqBody.title, reqBody.articleBody, reqBody.articleType, reqBody.author, reqBody.id], (error, result) => {
+        if (err) {
+            return res.send({
+                code: 400,
+                data: err
+            })
+        }
+        if (result.affectedRows === 0) {
+            return res.send({
+                code: 204,
+                msg: "修改失败"
+            })
+        }
+        db.query(UpdateArticleMainSql, [reqBody.article, reqBody.id], (error, result) => {
+            if (err) {
+                return res.send({
+                    code: 400,
+                    data: err
+                })
+            }
+            if (result.affectedRows === 0) {
+                return res.send({
+                    code: 204,
+                    msg: "修改失败"
+                })
+            }
+            return res.send({
+                code: 200,
+                msg: '修改成功'
+            })
+        })
+
+    })
+})
 app.get('/welcome', (req, res) => {
     res.send('<p>if you can see this message,that server is running</p><img src="https://img.moegirl.org.cn/common/b/ba/%E6%97%A9%E5%9D%82%E7%88%B1.png"><img>')
 })
