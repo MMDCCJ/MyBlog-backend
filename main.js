@@ -7,7 +7,7 @@ const { DateFormat } = require('./utils');
 const db = mysql.createPool({
     host: "127.0.0.1",
     user: 'root',
-    password: '20020522', // 上线后改成20020522
+    password: '020522', // 上线后改成20020522
     database: 'blog'
 })
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))
@@ -46,7 +46,7 @@ app.get('/api/article/overview', (req, res) => {
     const page = 5 * (Number(req.query.page) - 1);
     // 从后到前查找所有的文章 一次返回10条数据
     const sql = `SELECT * FROM Article
-                WHERE id <= (SELECT MAX(id) FROM Article)-?
+                WHERE id <= (SELECT MAX(id) FROM Article)-? AND Article.isDelete='N'
                 ORDER BY id DESC
                 LIMIT 5`
     db.query(sql, [page], (err, result) => {
@@ -144,7 +144,7 @@ app.post('/api/writing', (req, res) => {
 
 })
 // 获取文章的详细信息用于编辑
-app.get('api/writing/updateData', (req, res) => {
+app.get('/api/writing/updateData', (req, res) => {
     const id = req.query.id;
     const sql = `SELECT
     article_main.article,
@@ -155,9 +155,9 @@ app.get('api/writing/updateData', (req, res) => {
     FROM
     article_main ,
     article
-    WHERE article_main.id = ?,article.AID=article_main.id
+    WHERE article_main.AID = ? AND article.id=article_main.AID
     `
-    db.query(sql, [id], (error, result) => {
+    db.query(sql, [id], (err, result) => {
         if (err) {
             return res.send({
                 code: 400,
@@ -167,7 +167,7 @@ app.get('api/writing/updateData', (req, res) => {
         if (result.length === 0) {
             return res.send({
                 code: 204,
-                msg: "修改失败"
+                msg: "查询失败"
             })
         }
         return res.send({
@@ -177,27 +177,29 @@ app.get('api/writing/updateData', (req, res) => {
     })
 })
 // 修改更新文章
-app.post('api/updateArticle', (req, res) => {
+app.post('/api/updateArticle', (req, res) => {
     const reqBody = req.body
+    console.log(reqBody);
     const date = DateFormat(new Date())
-    const UpdateArticleSql = `UPDATE Article SET lastUpdate=?,title=?,articleBody=?,articleType=?,author=?
+    const UpdateArticleSql = `UPDATE Article SET lastUpdateDate=?,title=?,articleBody=?,articleType=?,author=?
     WHERE ID = ?
     `
     const UpdateArticleMainSql = `UPDATE Article_Main SET article=? WHERE AID=?`
-    db.query(UpdateArticleSql, [date, reqBody.title, reqBody.articleBody, reqBody.articleType, reqBody.author, reqBody.id], (error, result) => {
+    db.query(UpdateArticleSql, [date, reqBody.title, reqBody.articleBody, reqBody.articleType, reqBody.author, reqBody.id], (err, result) => {
         if (err) {
             return res.send({
                 code: 400,
                 data: err
             })
         }
+        console.log(result);
         if (result.affectedRows === 0) {
             return res.send({
                 code: 204,
                 msg: "修改失败"
             })
         }
-        db.query(UpdateArticleMainSql, [reqBody.article, reqBody.id], (error, result) => {
+        db.query(UpdateArticleMainSql, [reqBody.article, reqBody.id], (err, result) => {
             if (err) {
                 return res.send({
                     code: 400,
