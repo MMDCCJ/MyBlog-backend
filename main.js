@@ -10,13 +10,14 @@ const db = mysql.createPool({
     password: '020522', // 上线后改成20020522
     database: 'blog'
 })
-app.listen(port, () => console.log(`服务器现在运行在端口： ${port}!`))
+app.listen(port, () => console.log(`Example app listening on port ${port}!`))
 app.use('/', express.static('./web'))
 app.use(body_parser.urlencoded({ extended: false }))
 app.all('*', function (req, res, next) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST');
     res.setHeader("Access-Control-Allow-Headers", "content-type,curUserId,token,platform");
+
     next();
 })
 // 博客slogan
@@ -80,19 +81,25 @@ app.get('/api/article/overview', (req, res) => {
 // 查询具体文章
 app.get('/api/article/content', (req, res) => {
     const id = req.query.id;
-    const sql = `SELECT * FROM article_main
-                WHERE AID = ?`
+    console.log(`查询id:${id}`);
+    const sql = `SELECT * FROM Article_Main
+                    WHERE AID = ?`
     db.query(sql, [id], (err, result) => {
         if (err) {
-            res.send({
+            return res.send({
                 code: 400,
                 data: err
             })
         }
-        if (result.length === 0) {
+        if (result === undefined) {
             return res.send({
                 code: 204,
-                msg: "为查询到该id文章，请联系管理员"
+                msg: "未知错误可能是数据库寄了，请联系管理员"
+            })
+        } else if (result.length === 0) {
+            return res.send({
+                code: 204,
+                msg: "未查询到该id文章"
             })
         }
         return res.send({
