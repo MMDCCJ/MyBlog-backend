@@ -10,14 +10,13 @@ const db = mysql.createPool({
     password: '020522', // 上线后改成20020522
     database: 'blog'
 })
-app.listen(port, () => console.log(`Example app listening on port ${port}!`))
+app.listen(port, () => console.log(`服务器现在运行在端口： ${port}!`))
 app.use('/', express.static('./web'))
 app.use(body_parser.urlencoded({ extended: false }))
 app.all('*', function (req, res, next) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST');
     res.setHeader("Access-Control-Allow-Headers", "content-type,curUserId,token,platform");
-
     next();
 })
 // 博客slogan
@@ -171,8 +170,8 @@ app.get('/api/writing/updateData', (req, res) => {
             })
         }
         return res.send({
-            code:200,
-            data:result
+            code: 200,
+            data: result
         })
     })
 })
